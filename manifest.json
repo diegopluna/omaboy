@@ -5,12 +5,12 @@
   "version": "0.3.0",
   "author": "Diego Peter",
   "license": "MIT",
-  "description": "Game Boy / Game Boy Color emulator with live Omarchy theming — bar widget lists your games and recents, one click to play.",
+  "description": "Bar-widget launcher for the omaboy Game Boy / Game Boy Color emulator (with live Omarchy theming): lists your games and recents, one click to play. The emulator app itself is not installed by this plugin — build it from the same repo (see README).",
   "kinds": ["bar-widget"],
   "entryPoints": { "barWidget": "plugin/BarWidget.qml" },
   "barWidget": {
     "displayName": "Omaboy",
-    "description": "Launch Game Boy games from the bar: recents and your ROM library, played in the omaboy emulator.",
+    "description": "Launch Game Boy games from the bar: recents and your ROM library, played in the omaboy emulator (built separately from the plugin repo).",
     "category": "Media",
     "allowMultiple": false,
     "defaultSection": "right"

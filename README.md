@@ -41,6 +41,10 @@ in omaboy:
 omarchy plugin add https://github.com/diegopluna/omaboy --enable
 ```
 
+> **Note:** `omarchy plugin add` only installs the bar widget — it does
+> **not** build the emulator. Build and install omaboy first (section
+> above), or the widget will point you at the build instructions.
+
 Left-click the gamepad glyph for the game picker, right-click to open the
 emulator. The widget finds the `omaboy` binary on your PATH (install the app
 as above). The panel can also be summoned from a hotkey:
