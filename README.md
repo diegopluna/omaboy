@@ -74,3 +74,11 @@ to the ROM) and refuse to load into the wrong game.
 
 `core/target/release/headless <rom> [frames] [out.ppm]` runs the core without
 a UI (prints serial output from test ROMs, dumps the framebuffer).
+
+## Legal
+
+omaboy is a clean-room emulator: it contains no Nintendo code, no boot ROM,
+and no game data — the hardware behaviour is reimplemented from publicly
+available documentation. It does not ship games; play cartridges you own,
+dumped yourself. "Game Boy" and "Nintendo" are trademarks of Nintendo,
+used here only to describe compatibility. MIT licensed (see LICENSE).
