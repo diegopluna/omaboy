@@ -13,6 +13,7 @@ Item {
 
     // Rebuilt each time it opens so rebound keys show correctly.
     property var binds: []
+    property string padSummary: ""
     function kn(id) { return input.keyName(id) }
     function buildBinds() {
         return [
@@ -101,8 +102,8 @@ Item {
             width: parent.width - 40
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
-            text: (pad.connected ? pad.name.toLowerCase() + " · " : "controller · ")
-                  + "stick/d-pad move · east=a south=b · rb/rt turbo · lb pause"
+            text: (pad.connected ? pad.name.toLowerCase() : "controller")
+                  + " · " + help.padSummary
             font.family: monoFont
             font.pixelSize: 12
             color: pad.connected ? theme.foreground : theme.mutedColor
@@ -118,6 +119,7 @@ Item {
     onVisibleChanged: {
         if (visible) {
             binds = buildBinds()
+            padSummary = pad.summary()
             forceActiveFocus()
         }
     }

@@ -81,11 +81,14 @@ Default keys (all rebindable in settings, `f2`):
 | `f` / `f11` | fullscreen |
 
 **Controllers** just work: plug in any gamepad (SDL3 hotplug — Xbox,
-PlayStation, 8BitDo, whatever) and play. D-pad or left stick moves; the
-east button is A and south is B, matching the physical Game Boy layout;
-start/back are start/select; hold the right shoulder or right trigger
-for turbo; left shoulder pauses. The controller drives the game library
-too: move with the stick, A to launch, B to close.
+PlayStation, 8BitDo, whatever) and play. Defaults: d-pad or left stick
+moves; the east button is A and south is B, matching the physical Game
+Boy layout; start/back are start/select; hold the right shoulder or
+right trigger for turbo; left shoulder pauses. Every pad button is
+rebindable in settings (`f2`, controller section — press-to-capture,
+same as keyboard rebinding), including to save/load state, screenshot,
+palette, and the rest. The controller drives the game library too:
+move with the stick, A to launch, B to close.
 
 Settings (`f2`) also has: pause-on-focus-loss (auto-resumes when you come
 back), integer scaling, GBC color correction, resume-last-game-on-launch,

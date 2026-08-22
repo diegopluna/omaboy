@@ -4,8 +4,7 @@
 #include <QDebug>
 
 // GB button bits (match inputmap.cpp / core joypad).
-enum { BitRight = 0, BitLeft = 1, BitUp = 2, BitDown = 3,
-       BitA = 4, BitB = 5, BitSelect = 6, BitStart = 7 };
+enum { BitRight = 0, BitLeft = 1, BitUp = 2, BitDown = 3 };
 
 // Stick-to-dpad hysteresis: press past 50%, release under 35%.
 static constexpr Sint16 kPress = 16384;
@@ -13,7 +12,63 @@ static constexpr Sint16 kRelease = 11469;
 static constexpr Sint16 kTriggerOn = 16384;
 static constexpr Sint16 kTriggerOff = 8192;
 
-Gamepad::Gamepad(QObject *parent) : QObject(parent) {
+// Rebindable actions, in settings-UI order (labels match InputMap's).
+struct PadAction {
+    const char *id;
+    const char *label;
+};
+static const QList<PadAction> &padActions() {
+    static const QList<PadAction> list = {
+        {"a", "button a"},
+        {"b", "button b"},
+        {"start", "start"},
+        {"select", "select"},
+        {"turbo", "turbo (hold)"},
+        {"pause", "pause"},
+        {"save_state", "save state"},
+        {"load_state", "load state"},
+        {"next_slot", "next state slot"},
+        {"screenshot", "screenshot"},
+        {"reset", "reset game"},
+        {"palette", "cycle palette"},
+        {"mute", "mute"},
+        {"fullscreen", "fullscreen"},
+    };
+    return list;
+}
+
+// inputId -> action. Physical Game Boy layout: A is the right button,
+// B the lower one. Shoulder+trigger both turbo; lb and guide both pause.
+static QHash<QString, QString> defaultBinds() {
+    return {
+        {"east", "a"},   {"south", "b"},
+        {"start", "start"}, {"back", "select"},
+        {"rb", "turbo"}, {"rt", "turbo"},
+        {"lb", "pause"}, {"guide", "pause"},
+    };
+}
+
+static const char *inputIdForButton(int button) {
+    switch (button) {
+    case SDL_GAMEPAD_BUTTON_SOUTH: return "south";
+    case SDL_GAMEPAD_BUTTON_EAST: return "east";
+    case SDL_GAMEPAD_BUTTON_WEST: return "west";
+    case SDL_GAMEPAD_BUTTON_NORTH: return "north";
+    case SDL_GAMEPAD_BUTTON_BACK: return "back";
+    case SDL_GAMEPAD_BUTTON_GUIDE: return "guide";
+    case SDL_GAMEPAD_BUTTON_START: return "start";
+    case SDL_GAMEPAD_BUTTON_LEFT_STICK: return "l3";
+    case SDL_GAMEPAD_BUTTON_RIGHT_STICK: return "r3";
+    case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER: return "lb";
+    case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER: return "rb";
+    default: return nullptr;
+    }
+}
+
+Gamepad::Gamepad(QObject *parent)
+    : QObject(parent), m_settings("omaboy", "omaboy") {
+    load();
+
     // Controllers keep working while another window has keyboard focus
     // (we own no SDL window at all).
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
@@ -43,6 +98,90 @@ Gamepad::~Gamepad() {
         SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
 }
 
+// ---- bindings ----
+
+void Gamepad::load() {
+    m_binds.clear();
+    m_settings.beginGroup("padBindings");
+    const QStringList keys = m_settings.childKeys();
+    for (const QString &k : keys)
+        m_binds[k] = m_settings.value(k).toString();
+    m_settings.endGroup();
+    if (m_binds.isEmpty())
+        m_binds = defaultBinds();
+}
+
+void Gamepad::save() {
+    m_settings.beginGroup("padBindings");
+    m_settings.remove("");
+    for (auto it = m_binds.cbegin(); it != m_binds.cend(); ++it)
+        m_settings.setValue(it.key(), it.value());
+    m_settings.endGroup();
+}
+
+QVariantList Gamepad::model() const {
+    QVariantList rows;
+    for (const PadAction &a : padActions()) {
+        QVariantMap row;
+        row["id"] = a.id;
+        row["label"] = a.label;
+        row["padName"] = padName(a.id);
+        rows.append(row);
+    }
+    return rows;
+}
+
+QString Gamepad::padName(const QString &action) const {
+    QStringList inputs;
+    for (auto it = m_binds.cbegin(); it != m_binds.cend(); ++it)
+        if (it.value() == action)
+            inputs.append(it.key());
+    if (inputs.isEmpty())
+        return QStringLiteral("—");
+    inputs.sort();
+    return inputs.join(QStringLiteral(" / "));
+}
+
+void Gamepad::rebind(const QString &action, const QString &inputId) {
+    // One capture replaces the action's old inputs and steals the input
+    // from whatever it was bound to (same auto-unbind as the keyboard).
+    for (auto it = m_binds.begin(); it != m_binds.end();) {
+        if (it.value() == action)
+            it = m_binds.erase(it);
+        else
+            ++it;
+    }
+    m_binds[inputId] = action;
+    save();
+    emit changed();
+}
+
+void Gamepad::resetDefaults() {
+    m_binds = defaultBinds();
+    save();
+    emit changed();
+}
+
+QString Gamepad::summary() const {
+    QStringList parts;
+    parts << QStringLiteral("stick/d-pad move");
+    for (const PadAction &a : padActions()) {
+        const QString inputs = padName(a.id);
+        if (inputs != QStringLiteral("—"))
+            parts << inputs + QStringLiteral("=") + a.id;
+    }
+    return parts.join(QStringLiteral(" · "));
+}
+
+void Gamepad::setCapturing(bool on) {
+    if (m_capturing == on)
+        return;
+    m_capturing = on;
+    emit capturingChanged();
+}
+
+// ---- device handling ----
+
 void Gamepad::openFirstAvailable() {
     int count = 0;
     SDL_JoystickID *ids = SDL_GetGamepads(&count);
@@ -66,10 +205,32 @@ void Gamepad::closePad() {
     m_instanceId = 0;
     m_name.clear();
     // Release everything the pad was holding.
-    m_dpadMask = m_stickMask = m_buttonMask = 0;
-    m_shoulderTurbo = m_triggerTurbo = false;
+    m_dpadMask = m_stickMask = 0;
+    m_ltDown = m_rtDown = false;
     applyMask();
+    const QSet<QString> held = m_held;
+    m_held.clear();
+    for (const QString &id : held) {
+        const QString action = m_binds.value(id);
+        if (!action.isEmpty())
+            emit actionEvent(action, false);
+    }
     emit connectionChanged();
+}
+
+void Gamepad::handleInput(const QString &inputId, bool down) {
+    if (m_capturing) {
+        if (down)
+            emit captured(inputId);
+        return;
+    }
+    if (down)
+        m_held.insert(inputId);
+    else if (!m_held.remove(inputId))
+        return; // release for a press we never dispatched (e.g. capture)
+    const QString action = m_binds.value(inputId);
+    if (!action.isEmpty())
+        emit actionEvent(action, down);
 }
 
 void Gamepad::setSourceBit(quint8 &mask, int bit, bool down) {
@@ -80,19 +241,14 @@ void Gamepad::setSourceBit(quint8 &mask, int bit, bool down) {
 }
 
 void Gamepad::applyMask() {
-    const quint8 now = quint8(m_dpadMask | m_stickMask | m_buttonMask);
+    const quint8 now = quint8(m_dpadMask | m_stickMask);
     const quint8 diff = quint8(now ^ m_sentMask);
-    if (diff) {
-        for (int bit = 0; bit < 8; ++bit)
-            if (diff & (1u << bit))
-                emit buttonChanged(bit, now & (1u << bit));
-        m_sentMask = now;
-    }
-    const bool turbo = m_shoulderTurbo || m_triggerTurbo;
-    if (turbo != m_sentTurbo) {
-        m_sentTurbo = turbo;
-        emit turboChanged(turbo);
-    }
+    if (!diff)
+        return;
+    for (int bit = 0; bit < 4; ++bit)
+        if (diff & (1u << bit))
+            emit buttonChanged(bit, now & (1u << bit));
+    m_sentMask = now;
 }
 
 void Gamepad::poll() {
@@ -125,24 +281,15 @@ void Gamepad::poll() {
                 break;
             const bool down = ev.gbutton.down;
             switch (ev.gbutton.button) {
-            case SDL_GAMEPAD_BUTTON_DPAD_UP:    setSourceBit(m_dpadMask, BitUp, down); break;
-            case SDL_GAMEPAD_BUTTON_DPAD_DOWN:  setSourceBit(m_dpadMask, BitDown, down); break;
-            case SDL_GAMEPAD_BUTTON_DPAD_LEFT:  setSourceBit(m_dpadMask, BitLeft, down); break;
-            case SDL_GAMEPAD_BUTTON_DPAD_RIGHT: setSourceBit(m_dpadMask, BitRight, down); break;
-            // Physical Game Boy layout: A is the right button, B the lower-left.
-            case SDL_GAMEPAD_BUTTON_EAST:  setSourceBit(m_buttonMask, BitA, down); break;
-            case SDL_GAMEPAD_BUTTON_SOUTH: setSourceBit(m_buttonMask, BitB, down); break;
-            case SDL_GAMEPAD_BUTTON_START: setSourceBit(m_buttonMask, BitStart, down); break;
-            case SDL_GAMEPAD_BUTTON_BACK:  setSourceBit(m_buttonMask, BitSelect, down); break;
-            case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER: m_shoulderTurbo = down; break;
-            case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
-            case SDL_GAMEPAD_BUTTON_GUIDE:
-                if (down)
-                    emit pausePressed();
+            case SDL_GAMEPAD_BUTTON_DPAD_UP:    setSourceBit(m_dpadMask, BitUp, down); applyMask(); break;
+            case SDL_GAMEPAD_BUTTON_DPAD_DOWN:  setSourceBit(m_dpadMask, BitDown, down); applyMask(); break;
+            case SDL_GAMEPAD_BUTTON_DPAD_LEFT:  setSourceBit(m_dpadMask, BitLeft, down); applyMask(); break;
+            case SDL_GAMEPAD_BUTTON_DPAD_RIGHT: setSourceBit(m_dpadMask, BitRight, down); applyMask(); break;
+            default:
+                if (const char *id = inputIdForButton(ev.gbutton.button))
+                    handleInput(QString::fromLatin1(id), down);
                 break;
-            default: break;
             }
-            applyMask();
             break;
         }
 
@@ -156,20 +303,25 @@ void Gamepad::poll() {
                 else if (v >= -kRelease) setSourceBit(m_stickMask, BitLeft, false);
                 if (v >= kPress) setSourceBit(m_stickMask, BitRight, true);
                 else if (v <= kRelease) setSourceBit(m_stickMask, BitRight, false);
+                applyMask();
                 break;
             case SDL_GAMEPAD_AXIS_LEFTY:
                 if (v <= -kPress) setSourceBit(m_stickMask, BitUp, true);
                 else if (v >= -kRelease) setSourceBit(m_stickMask, BitUp, false);
                 if (v >= kPress) setSourceBit(m_stickMask, BitDown, true);
                 else if (v <= kRelease) setSourceBit(m_stickMask, BitDown, false);
+                applyMask();
+                break;
+            case SDL_GAMEPAD_AXIS_LEFT_TRIGGER:
+                if (v >= kTriggerOn && !m_ltDown) { m_ltDown = true; handleInput("lt", true); }
+                else if (v <= kTriggerOff && m_ltDown) { m_ltDown = false; handleInput("lt", false); }
                 break;
             case SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:
-                if (v >= kTriggerOn) m_triggerTurbo = true;
-                else if (v <= kTriggerOff) m_triggerTurbo = false;
+                if (v >= kTriggerOn && !m_rtDown) { m_rtDown = true; handleInput("rt", true); }
+                else if (v <= kTriggerOff && m_rtDown) { m_rtDown = false; handleInput("rt", false); }
                 break;
             default: break;
             }
-            applyMask();
             break;
         }
 

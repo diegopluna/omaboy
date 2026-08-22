@@ -4,6 +4,18 @@ All notable changes to omaboy are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 uses [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-08-22
+
+### Added
+- **Rebindable controller mappings**: the settings overlay (`f2`) gained
+  a controller section — select an action, press a pad button (or pull a
+  trigger) to bind it, same press-to-capture flow as the keyboard.
+  Any action can go on any button: save/load state, screenshot, palette,
+  reset, mute, fullscreen included. Conflicting binds auto-unbind; one
+  reset row restores keyboard and controller defaults; the help overlay
+  shows the live controller mapping. Bindings persist in the config.
+  D-pad and left stick stay mapped to the GB d-pad.
+
 ## [0.4.1] - 2026-08-22
 
 ### Fixed

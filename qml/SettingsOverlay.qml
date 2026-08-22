@@ -8,8 +8,9 @@ Item {
     signal closed()
 
     property var rows: []
-    property string capturing: ""  // action id being rebound
-    property int tick: 0           // bumped to refresh value bindings
+    property string capturing: ""     // action id being rebound (keyboard)
+    property string capturingPad: ""  // action id being rebound (controller)
+    property int tick: 0              // bumped to refresh value bindings
 
     function open() {
         rows = buildModel()
@@ -20,8 +21,14 @@ Item {
 
     function close() {
         capturing = ""
+        stopPadCapture()
         visible = false
         closed()
+    }
+
+    function stopPadCapture() {
+        capturingPad = ""
+        pad.capturing = false
     }
 
     function toggle() { visible ? close() : open() }
@@ -45,6 +52,10 @@ Item {
         const bindings = input.model()
         for (const b of bindings)
             r.push({ type: "key", label: b.label, id: b.id })
+        r.push({ type: "header", label: "controller · enter to rebind" })
+        const padBindings = pad.model()
+        for (const b of padBindings)
+            r.push({ type: "pad", label: b.label, id: b.id })
         r.push({ type: "action", label: "reset controls to defaults" })
         return r
     }
@@ -59,6 +70,8 @@ Item {
         }
         if (row.type === "key")
             return capturing === row.id ? "press a key…" : input.keyName(row.id)
+        if (row.type === "pad")
+            return capturingPad === row.id ? "press a button…" : pad.padName(row.id)
         if (row.type === "volume")
             return emu.muted ? "muted" : Math.round(emu.volume * 100) + "%"
         return ""
@@ -75,9 +88,19 @@ Item {
             emu.muted = false
             emu.volume = Math.max(0, Math.min(1, emu.volume + dir * 0.1))
         } else if (row.type === "key") {
+            stopPadCapture()
             capturing = capturing === row.id ? "" : row.id
+        } else if (row.type === "pad") {
+            capturing = ""
+            if (capturingPad === row.id) {
+                stopPadCapture()
+            } else {
+                capturingPad = row.id
+                pad.capturing = true
+            }
         } else if (row.type === "action") {
             input.resetDefaults()
+            pad.resetDefaults()
         }
     }
 
@@ -99,6 +122,16 @@ Item {
     Connections {
         target: input
         function onChanged() { overlay.tick++ }
+    }
+    Connections {
+        target: pad
+        function onChanged() { overlay.tick++ }
+        function onCaptured(inputId) {
+            if (overlay.capturingPad === "")
+                return
+            pad.rebind(overlay.capturingPad, inputId)
+            overlay.stopPadCapture()
+        }
     }
 
     Rectangle {
@@ -185,7 +218,8 @@ Item {
                     text: overlay.valueText(modelData)
                     font.family: monoFont
                     font.pixelSize: 13
-                    color: overlay.capturing === modelData.id && modelData.type === "key"
+                    color: (overlay.capturing === modelData.id && modelData.type === "key")
+                           || (overlay.capturingPad === modelData.id && modelData.type === "pad")
                            ? theme.yellow : theme.accent
                 }
 
@@ -205,7 +239,8 @@ Item {
             anchors.bottomMargin: 12
             anchors.horizontalCenter: parent.horizontalCenter
             text: capturing !== "" ? "press the new key · esc cancel"
-                                   : "↑↓ move · ←→/enter change · esc close"
+                : capturingPad !== "" ? "press a controller button · esc cancel"
+                : "↑↓ move · ←→/enter change · esc close"
             font.family: monoFont
             font.pixelSize: 11
             color: theme.mutedColor
@@ -214,6 +249,11 @@ Item {
 
     Keys.onPressed: (event) => {
         event.accepted = true
+        if (capturingPad !== "") {
+            if (event.key === Qt.Key_Escape)
+                stopPadCapture()
+            return
+        }
         if (capturing !== "") {
             if (event.key === Qt.Key_Escape) {
                 capturing = ""

@@ -158,19 +158,39 @@ Window {
     Connections {
         target: pad
         function onButtonChanged(bit, down) {
+            if (settings.visible || help.visible)
+                return
             if (browser.visible) {
-                if (down && browser.padNavigate(bit))
-                    return
+                if (down) browser.padNavigate(bit)
                 return
             }
             emu.setButton(bit, down)
         }
-        function onTurboChanged(down) { emu.turbo = down }
-        function onPausePressed() {
-            if (browser.visible)
-                browser.toggle()
-            else if (emu.romLoaded)
-                emu.togglePause()
+        function onActionEvent(action, down) {
+            if (settings.visible || help.visible)
+                return
+            if (browser.visible) {
+                if (down) browser.padAction(action)
+                return
+            }
+            const bit = input.buttonBit(action)
+            if (bit >= 0) { emu.setButton(bit, down); return }
+            if (action === "turbo") { emu.turbo = down; return }
+            if (!down) return
+            switch (action) {
+            case "pause": emu.togglePause(); break
+            case "save_state": emu.saveState(); break
+            case "load_state": emu.loadState(); break
+            case "next_slot": emu.nextSlot(); break
+            case "screenshot": emu.screenshot(); break
+            case "palette": emu.cyclePalette(); break
+            case "reset": emu.reset(); toast.show("reset"); break
+            case "fullscreen": keys.toggleFullscreen(); break
+            case "mute":
+                emu.muted = !emu.muted
+                toast.show(emu.muted ? "muted" : "unmuted")
+                break
+            }
         }
         function onToast(message) { toast.show(message) }
     }
