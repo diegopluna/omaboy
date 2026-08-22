@@ -31,6 +31,20 @@ cmake --install build --prefix ~/.local   # binary + launcher entry
 
 Run `omaboy` (or from your launcher), or `omaboy path/to/game.gbc`.
 
+## Omarchy bar plugin
+
+This repo doubles as an [Omarchy shell plugin](https://omarchyplugins.com) —
+a bar widget that lists your recent games and ROM library and launches them
+in omaboy:
+
+```sh
+omarchy plugin add https://github.com/diegopluna/omaboy --enable
+```
+
+Left-click the gamepad glyph for the game picker, right-click to open the
+emulator. The widget finds the `omaboy` binary on your PATH (install the app
+as above).
+
 ## Usage
 
 Drop your ROMs (`.gb`, `.gbc`, or zipped) in `~/Games` — or press `esc` →

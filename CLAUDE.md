@@ -58,6 +58,19 @@ cmake --install build --prefix ~/.local      # binary, .desktop, icon
 - Game pixels are exempt from theming by default: DMG palette defaults to
   classic green (user preference); the theme-derived palette is opt-in.
 
+## Omarchy shell plugin (manifest.json + plugin/)
+
+The repo is also an installable omarchy-shell plugin (bar-widget kind): a
+launcher panel that spawns the omaboy binary via `Quickshell.execDetached`.
+Plugin QML runs inside omarchy-shell's engine — pure QML/JS only, no native
+code. Use the shell's own components (`qs.Ui`: BarWidget, WidgetButton,
+Panel/KeyboardPanel, PanelHero(title/meta/detail), PanelSectionHeader,
+Button — check property names in ~/.local/share/omarchy/shell/Ui/ before
+using them). Validate with `omarchy plugin validate .`; the shell hot-reloads
+the installed copy in ~/.config/omarchy/plugins/io.github.diegopluna.omaboy/
+on file change (QML errors appear in `journalctl --user`). Keep
+manifest.json's `version` in lockstep with the app version.
+
 ## Sidecar files (next to the ROM)
 
 `.sav` battery RAM (standard, other-emulator compatible) · `.rtc` clock

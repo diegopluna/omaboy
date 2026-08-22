@@ -167,10 +167,8 @@ Panel {
 
           PanelHero {
             width: parent.width
-            bar: root.bar
-            icon: ""
             title: "Omaboy"
-            subtitle: root.appInstalled
+            meta: root.appInstalled
               ? "game boy · game boy color"
               : "emulator not installed"
           }
@@ -189,9 +187,10 @@ Panel {
               font.family: root.bar ? root.bar.fontFamily : "monospace"
               font.pixelSize: Style.font.caption
             }
-            PanelActionButton {
-              bar: root.bar
+            Button {
               text: "Open build instructions"
+              bordered: true
+              hasCursor: true
               onClicked: {
                 Quickshell.execDetached(["xdg-open", "https://github.com/diegopluna/omaboy#build--install"])
                 root.close()
@@ -202,7 +201,6 @@ Panel {
           // Recents
           PanelSectionHeader {
             width: parent.width
-            bar: root.bar
             visible: root.appInstalled && root.recentGames.length > 0
             text: "Recent"
           }
@@ -214,7 +212,6 @@ Panel {
           // Library
           PanelSectionHeader {
             width: parent.width
-            bar: root.bar
             visible: root.appInstalled && root.libraryGames.length > 0
             text: "Library"
           }
@@ -234,10 +231,11 @@ Panel {
             font.pixelSize: Style.font.caption
           }
 
-          PanelActionButton {
-            bar: root.bar
+          Button {
             visible: root.appInstalled
             text: "Open omaboy"
+            bordered: true
+            hasCursor: true
             onClicked: root.launchApp("")
           }
         }

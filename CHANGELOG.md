@@ -4,6 +4,17 @@ All notable changes to omaboy are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 uses [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-08-21
+
+### Added
+- **Omarchy shell plugin** (`manifest.json` + `plugin/`): this repo now
+  doubles as an installable bar widget —
+  `omarchy plugin add https://github.com/diegopluna/omaboy --enable`.
+  A gamepad glyph in the bar opens a panel listing your recent games (read
+  from omaboy's config) and ROM library; one click launches the game in the
+  emulator. Right-click opens omaboy directly. Detects a missing omaboy
+  binary and points at the build instructions.
+
 ## [0.2.0] - 2026-08-21
 
 ### Added
