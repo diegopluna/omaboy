@@ -4,6 +4,15 @@ All notable changes to omaboy are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 uses [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] - 2026-08-22
+
+### Fixed
+- UI froze when connecting some controllers (8BitDo): SDL's HIDAPI
+  drivers ran a blocking device handshake on the UI thread at hotplug.
+  Controllers now use the kernel's evdev driver only.
+- The app ignored SIGTERM/ctrl-c (SDL was converting them into an SDL
+  quit event that never reached Qt).
+
 ## [0.4.0] - 2026-08-22
 
 ### Added

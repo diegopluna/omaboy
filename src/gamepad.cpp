@@ -17,6 +17,13 @@ Gamepad::Gamepad(QObject *parent) : QObject(parent) {
     // Controllers keep working while another window has keyboard focus
     // (we own no SDL window at all).
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+    // Plain evdev only: SDL's HIDAPI drivers (libusb here) run blocking
+    // device handshakes on hotplug, on this thread — 8BitDo pads froze
+    // the UI. The kernel driver already exposes everything we need.
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "0");
+    // SDL would otherwise swallow SIGINT/SIGTERM into SDL_EVENT_QUIT,
+    // making the app unkillable from the terminal.
+    SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
     if (!SDL_InitSubSystem(SDL_INIT_GAMEPAD)) {
         qWarning() << "gamepad: SDL init failed:" << SDL_GetError();
         return;
