@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.diegopluna.omaboy",
   "name": "Omaboy",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Diego Peter",
   "license": "MIT",
   "description": "Bar-widget launcher for the omaboy Game Boy / Game Boy Color emulator (with live Omarchy theming): lists your games and recents, one click to play. The emulator app itself is not installed by this plugin — build it from the same repo (see README).",

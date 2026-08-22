@@ -4,6 +4,18 @@ All notable changes to omaboy are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 uses [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-08-22
+
+### Added
+- **Controller support** (SDL3): plug in any gamepad and play — hotplug
+  with on-screen connect/disconnect toasts, no configuration. D-pad and
+  left stick both drive the GB d-pad (merged, with hysteresis on the
+  stick); east button = A, south = B (physical Game Boy layout);
+  start/back = start/select; right shoulder or right trigger = turbo
+  (hold); left shoulder or guide = pause. The controller also navigates
+  the game library: stick/d-pad to move, A/start to launch, B to close.
+  Works while the window is unfocused (input is evdev-level).
+
 ## [0.3.0] - 2026-08-21
 
 ### Added

@@ -43,7 +43,10 @@ cmake --install build --prefix ~/.local      # binary, .desktop, icon
   audio-ring fill (±3% around 59.73 Hz); every core call goes through
   `m_coreMutex`. Options are Q_PROPERTYs persisted via QSettings
   (`~/.config/omaboy/omaboy.conf`). `inputmap.cpp` owns rebindable keys
-  (esc/f1/f2/f11 reserved). `theme.cpp` parses Omarchy colors.
+  (esc/f1/f2/f11 reserved). `gamepad.cpp` is SDL3 controller input
+  (fixed mapping, hotplug, d-pad+stick merged; test it with an SDL
+  virtual gamepad — no hardware needed). `theme.cpp` parses Omarchy
+  colors.
 - `qml/`: Main window + walker-style overlays (RomBrowser, SettingsOverlay,
   HelpOverlay). Overlays anchor **above** the status bar so its hints stay
   visible; new global shortcuts belong in the status bar hint line too.

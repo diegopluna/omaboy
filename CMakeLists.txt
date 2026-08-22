@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(omaboy VERSION 0.3.0 LANGUAGES CXX)
+project(omaboy VERSION 0.4.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -8,6 +8,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Quick Multimedia)
+find_package(SDL3 REQUIRED CONFIG)
 qt_standard_project_setup(REQUIRES 6.5)
 qt_policy(SET QTP0004 NEW)
 
@@ -35,6 +36,8 @@ qt_add_executable(omaboy
     src/main.cpp
     src/emulator.cpp
     src/emulator.h
+    src/gamepad.cpp
+    src/gamepad.h
     src/inputmap.cpp
     src/inputmap.h
     src/screenitem.cpp
@@ -60,6 +63,7 @@ target_compile_definitions(omaboy PRIVATE OMABOY_VERSION="${PROJECT_VERSION}")
 target_link_libraries(omaboy PRIVATE
     Qt6::Quick
     Qt6::Multimedia
+    SDL3::SDL3
     omaboy_core
     pthread dl m
 )

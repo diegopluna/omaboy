@@ -21,7 +21,7 @@ survive across sessions).
 
 ## Build & install
 
-Needs: `qt6-base` `qt6-declarative` `qt6-multimedia` `cmake` `rust`
+Needs: `qt6-base` `qt6-declarative` `qt6-multimedia` `sdl3` `cmake` `rust`
 
 ```sh
 cmake -B build
@@ -79,6 +79,13 @@ Default keys (all rebindable in settings, `f2`):
 | `p` | cycle palette (classic / mono / omarchy) |
 | `m`, `+`, `-` | mute, volume |
 | `f` / `f11` | fullscreen |
+
+**Controllers** just work: plug in any gamepad (SDL3 hotplug — Xbox,
+PlayStation, 8BitDo, whatever) and play. D-pad or left stick moves; the
+east button is A and south is B, matching the physical Game Boy layout;
+start/back are start/select; hold the right shoulder or right trigger
+for turbo; left shoulder pauses. The controller drives the game library
+too: move with the stick, A to launch, B to close.
 
 Settings (`f2`) also has: pause-on-focus-loss (auto-resumes when you come
 back), integer scaling, GBC color correction, resume-last-game-on-launch,

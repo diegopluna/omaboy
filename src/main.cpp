@@ -1,4 +1,5 @@
 #include "emulator.h"
+#include "gamepad.h"
 #include "inputmap.h"
 #include "theme.h"
 
@@ -39,6 +40,7 @@ int main(int argc, char *argv[]) {
     Theme theme;
     Emulator emulator(&theme);
     InputMap input;
+    Gamepad gamepad;
 
     QFont mono("JetBrainsMono Nerd Font");
     if (!QFontDatabase::families().contains(mono.family()))
@@ -50,6 +52,7 @@ int main(int argc, char *argv[]) {
     engine.rootContext()->setContextProperty("theme", &theme);
     engine.rootContext()->setContextProperty("emu", &emulator);
     engine.rootContext()->setContextProperty("input", &input);
+    engine.rootContext()->setContextProperty("pad", &gamepad);
     engine.rootContext()->setContextProperty("monoFont", mono.family());
 
     // omaboy <rom> loads straight into the game (before QML decides

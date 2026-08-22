@@ -152,6 +152,29 @@ Window {
 
     Toast { id: toast }
 
+    // Controller input lands in the same funnel as the keyboard. The
+    // browser gets first refusal on navigation so a pad can drive the
+    // library too; otherwise buttons go to the game.
+    Connections {
+        target: pad
+        function onButtonChanged(bit, down) {
+            if (browser.visible) {
+                if (down && browser.padNavigate(bit))
+                    return
+                return
+            }
+            emu.setButton(bit, down)
+        }
+        function onTurboChanged(down) { emu.turbo = down }
+        function onPausePressed() {
+            if (browser.visible)
+                browser.toggle()
+            else if (emu.romLoaded)
+                emu.togglePause()
+        }
+        function onToast(message) { toast.show(message) }
+    }
+
     Connections {
         target: emu
         function onErrorChanged() {

@@ -51,6 +51,28 @@ Item {
         listView.currentIndex = list.length > 0 ? 0 : -1
     }
 
+    // Controller navigation: d-pad/stick moves, A launches, B closes.
+    // Bits match the GB joypad (0=Right 1=Left 2=Up 3=Down 4=A 5=B).
+    function padNavigate(bit) {
+        switch (bit) {
+        case 2:
+            listView.currentIndex = Math.max(listView.currentIndex - 1, 0)
+            return true
+        case 3:
+            listView.currentIndex =
+                Math.min(listView.currentIndex + 1, entries.length - 1)
+            return true
+        case 4:
+        case 7: // start
+            activate()
+            return true
+        case 5:
+            close()
+            return true
+        }
+        return false
+    }
+
     function activate() {
         if (listView.currentIndex < 0 || listView.currentIndex >= entries.length)
             return

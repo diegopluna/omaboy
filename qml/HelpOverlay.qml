@@ -44,7 +44,7 @@ Item {
     Rectangle {
         anchors.centerIn: parent
         width: Math.min(680, parent.width - 60)
-        height: grid.height + title.height + 56
+        height: grid.height + title.height + padLine.height + 66
         color: theme.background
         border.width: 2
         border.color: theme.accent
@@ -91,6 +91,21 @@ Item {
                     }
                 }
             }
+        }
+
+        Text {
+            id: padLine
+            anchors.top: grid.bottom
+            anchors.topMargin: 14
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width - 40
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+            text: (pad.connected ? pad.name.toLowerCase() + " · " : "controller · ")
+                  + "stick/d-pad move · east=a south=b · rb/rt turbo · lb pause"
+            font.family: monoFont
+            font.pixelSize: 12
+            color: pad.connected ? theme.foreground : theme.mutedColor
         }
     }
 
