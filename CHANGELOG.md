@@ -12,6 +12,8 @@ uses [Semantic Versioning](https://semver.org/).
   Controllers now use the kernel's evdev driver only.
 - The app ignored SIGTERM/ctrl-c (SDL was converting them into an SDL
   quit event that never reached Qt).
+- No "controller connected" toast when the pad was already connected
+  before launch (it fired before the UI existed) — shown at startup now.
 
 ## [0.4.0] - 2026-08-22
 

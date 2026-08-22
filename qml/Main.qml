@@ -278,6 +278,9 @@ Window {
 
     Component.onCompleted: {
         keys.forceActiveFocus()
+        // A pad opened before QML loaded emitted its toast into the void.
+        if (pad.connected)
+            toast.show("controller · " + pad.name.toLowerCase())
         if (Qt.application.arguments.indexOf("--open-settings") >= 0)
             settings.open()
         else if (!emu.romLoaded)
