@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Omaboy
+GenericName=Game Boy Emulator
+Comment=Game Boy / Game Boy Color emulator with Omarchy theming
+Exec=omaboy %f
+Icon=omaboy
+Terminal=false
+Categories=Game;Emulator;
+MimeType=application/x-gameboy-rom;application/x-gameboy-color-rom;
+Keywords=gameboy;gbc;emulator;pokemon;

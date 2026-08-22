@@ -1,0 +1,16 @@
+[package]
+name = "omaboy-core"
+version = "0.2.0"
+edition = "2021"
+
+[lib]
+name = "omaboy_core"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+flate2 = { version = "1", default-features = false, features = ["rust_backend"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = "abort"
