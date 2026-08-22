@@ -136,6 +136,17 @@ Panel {
     }
   }
 
+  // Hotkey/IPC summon: omarchy shell io.github.diegopluna.omaboy toggle
+  IpcHandler {
+    target: root.ipcTarget
+
+    function open(): void { root.openFromHotkey() }
+    function close(): void { root.close() }
+    function show(): void { root.openFromHotkey() }
+    function hide(): void { root.close() }
+    function toggle(): void { root.toggle() }
+  }
+
   KeyboardPanel {
     id: panel
     anchorItem: root.anchorItem
