@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.diegopluna.omaboy",
+  "name": "Omaboy",
+  "version": "0.2.0",
+  "author": "Diego Peter",
+  "license": "MIT",
+  "description": "Game Boy / Game Boy Color emulator with live Omarchy theming — bar widget lists your games and recents, one click to play.",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "plugin/BarWidget.qml" },
+  "barWidget": {
+    "displayName": "Omaboy",
+    "description": "Launch Game Boy games from the bar: recents and your ROM library, played in the omaboy emulator.",
+    "category": "Media",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
