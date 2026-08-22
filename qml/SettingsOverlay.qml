@@ -126,6 +126,7 @@ Item {
     Connections {
         target: pad
         function onChanged() { overlay.tick++ }
+        function onConnectionChanged() { overlay.tick++ }
         function onCaptured(inputId) {
             if (overlay.capturingPad === "")
                 return

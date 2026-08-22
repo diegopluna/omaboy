@@ -4,6 +4,15 @@ All notable changes to omaboy are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 uses [Semantic Versioning](https://semver.org/).
 
+## [0.5.1] - 2026-08-22
+
+### Changed
+- Controller bindings display the connected pad's printed face-button
+  labels (a/b/x/y on Xbox and Nintendo layouts, cross/circle/square/
+  triangle on PlayStation) instead of positional names; positions
+  ("east", "south") remain the fallback with no pad connected, and are
+  still what's stored — bindings survive switching controller brands.
+
 ## [0.5.0] - 2026-08-22
 
 ### Added

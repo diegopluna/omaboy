@@ -131,11 +131,37 @@ QVariantList Gamepad::model() const {
     return rows;
 }
 
+// Bindings are stored by position (an Xbox pad's "east" is a Nintendo
+// pad's "east" even though the printed letter differs), but display
+// uses the connected controller's own face-button labels.
+QString Gamepad::inputDisplayName(const QString &inputId) const {
+    static const QHash<QString, int> face = {
+        {QStringLiteral("south"), SDL_GAMEPAD_BUTTON_SOUTH},
+        {QStringLiteral("east"), SDL_GAMEPAD_BUTTON_EAST},
+        {QStringLiteral("west"), SDL_GAMEPAD_BUTTON_WEST},
+        {QStringLiteral("north"), SDL_GAMEPAD_BUTTON_NORTH},
+    };
+    const auto it = face.constFind(inputId);
+    if (it == face.constEnd() || !m_pad)
+        return inputId;
+    switch (SDL_GetGamepadButtonLabel(m_pad, SDL_GamepadButton(it.value()))) {
+    case SDL_GAMEPAD_BUTTON_LABEL_A: return QStringLiteral("a");
+    case SDL_GAMEPAD_BUTTON_LABEL_B: return QStringLiteral("b");
+    case SDL_GAMEPAD_BUTTON_LABEL_X: return QStringLiteral("x");
+    case SDL_GAMEPAD_BUTTON_LABEL_Y: return QStringLiteral("y");
+    case SDL_GAMEPAD_BUTTON_LABEL_CROSS: return QStringLiteral("cross");
+    case SDL_GAMEPAD_BUTTON_LABEL_CIRCLE: return QStringLiteral("circle");
+    case SDL_GAMEPAD_BUTTON_LABEL_SQUARE: return QStringLiteral("square");
+    case SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE: return QStringLiteral("triangle");
+    default: return inputId;
+    }
+}
+
 QString Gamepad::padName(const QString &action) const {
     QStringList inputs;
     for (auto it = m_binds.cbegin(); it != m_binds.cend(); ++it)
         if (it.value() == action)
-            inputs.append(it.key());
+            inputs.append(inputDisplayName(it.key()));
     if (inputs.isEmpty())
         return QStringLiteral("—");
     inputs.sort();

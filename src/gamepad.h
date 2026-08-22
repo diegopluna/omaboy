@@ -31,6 +31,7 @@ public:
     Q_INVOKABLE QVariantList model() const;
 
     /// Pad inputs bound to an action, e.g. "east" or "rb / rt", or "—".
+    /// Face buttons use the connected pad's printed labels when known.
     Q_INVOKABLE QString padName(const QString &action) const;
 
     /// Bind a captured input to an action (replaces both sides' bindings).
@@ -56,6 +57,7 @@ private:
     void poll();
     void openFirstAvailable();
     void closePad();
+    QString inputDisplayName(const QString &inputId) const;
     void handleInput(const QString &inputId, bool down);
     void setSourceBit(quint8 &mask, int bit, bool down);
     void applyMask();
