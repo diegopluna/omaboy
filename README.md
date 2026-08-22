@@ -43,7 +43,12 @@ omarchy plugin add https://github.com/diegopluna/omaboy --enable
 
 Left-click the gamepad glyph for the game picker, right-click to open the
 emulator. The widget finds the `omaboy` binary on your PATH (install the app
-as above).
+as above). The panel can also be summoned from a hotkey:
+`omarchy shell io.github.diegopluna.omaboy toggle`.
+
+To remove: `omarchy plugin remove io.github.diegopluna.omaboy` (the emulator
+itself, if installed, is just `~/.local/bin/omaboy` plus its desktop entry
+and icon — delete those to uninstall it).
 
 ## Usage
 
