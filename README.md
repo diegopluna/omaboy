@@ -19,7 +19,19 @@ survive across sessions).
 - Walker-style keyboard-driven game library (`esc`), JetBrainsMono, no chrome.
 - Sets Wayland app-id `omaboy` for Hyprland window rules.
 
-## Build & install
+## Install
+
+On Arch, grab the prebuilt package from the
+[latest release](https://github.com/diegopluna/omaboy/releases/latest):
+
+```sh
+sudo pacman -U https://github.com/diegopluna/omaboy/releases/download/v0.5.1/omaboy-0.5.1-1-x86_64.pkg.tar.zst
+```
+
+or build it yourself from `packaging/aur/PKGBUILD` (`makepkg -si`).
+An AUR package is coming once AUR registration reopens.
+
+## Build & install (from source)
 
 Needs: `qt6-base` `qt6-declarative` `qt6-multimedia` `sdl3` `cmake` `rust`
 
