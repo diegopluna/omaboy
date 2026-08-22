@@ -1,0 +1,33 @@
+# Maintainer: Diego Peter <diegopeter9@gmail.com>
+pkgname=omaboy
+pkgver=0.5.1
+pkgrel=1
+pkgdesc="Game Boy / Game Boy Color emulator with live Omarchy theming"
+arch=('x86_64' 'aarch64')
+url="https://github.com/diegopluna/omaboy"
+license=('MIT')
+depends=('qt6-base' 'qt6-declarative' 'qt6-multimedia' 'sdl3' 'hicolor-icon-theme')
+makedepends=('cmake' 'cargo')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('f723c026cd3fe293d8eb71416f18c21730124d30aae22d28d9c2dc51ae9a49d9')
+
+prepare() {
+    cd "$pkgname-$pkgver/core"
+    export RUSTUP_TOOLCHAIN=stable
+    cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+    export RUSTUP_TOOLCHAIN=stable
+    export CARGO_NET_OFFLINE=true
+    cmake -B build -S "$pkgname-$pkgver" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr
+    cmake --build build
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+    install -Dm644 "$pkgname-$pkgver/LICENSE" \
+        "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

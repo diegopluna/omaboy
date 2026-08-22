@@ -1,0 +1,19 @@
+pkgbase = omaboy
+	pkgdesc = Game Boy / Game Boy Color emulator with live Omarchy theming
+	pkgver = 0.5.1
+	pkgrel = 1
+	url = https://github.com/diegopluna/omaboy
+	arch = x86_64
+	arch = aarch64
+	license = MIT
+	makedepends = cmake
+	makedepends = cargo
+	depends = qt6-base
+	depends = qt6-declarative
+	depends = qt6-multimedia
+	depends = sdl3
+	depends = hicolor-icon-theme
+	source = omaboy-0.5.1.tar.gz::https://github.com/diegopluna/omaboy/archive/refs/tags/v0.5.1.tar.gz
+	sha256sums = f723c026cd3fe293d8eb71416f18c21730124d30aae22d28d9c2dc51ae9a49d9
+
+pkgname = omaboy

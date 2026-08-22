@@ -16,6 +16,10 @@ cmake --install build --prefix ~/.local      # binary, .desktop, icon
   links `core/target/release/libomaboy_core.a`.
 - Versioning: bump `project(... VERSION x.y.z)` in CMakeLists.txt **and**
   `version` in core/Cargo.toml together; update CHANGELOG.md.
+- AUR: `packaging/aur/PKGBUILD` builds from the GitHub release tag. On each
+  release: bump `pkgver`, update `sha256sums` from the new tarball,
+  regenerate `.SRCINFO` (`makepkg --printsrcinfo`), test `makepkg -f`, and
+  push both files to the AUR repo (`ssh://aur@aur.archlinux.org/omaboy.git`).
 
 ## Testing the emulator core
 
